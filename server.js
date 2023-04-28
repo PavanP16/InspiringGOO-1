@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const ejs = require('ejs');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const app=express();
 app.use(cookieParser());
 
@@ -19,13 +20,31 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(cookieParser());
 
-app.use(
-  session({
-    secret: "Our little secret.",
-    resave: false,
-    saveUninitialized: false,
+// app.use(
+//   session({
+//     secret: ,
+//     resave: false,
+//     saveUninitialized: false,
+//   })
+// );
+
+
+app.use(session({
+  secret:"Our little secret." ,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl:"mongodb+srv://pavankumarp21:pavan1234@cluster0.k9kh9zv.mongodb.net/INSPIRINGGO?retryWrites=true&w=majority",
+    mongooseConnection: mongoose.connection,
+    collectionName:'sessions'
   })
-);
+}));
+
+
+
+
+
+
 
 mongoose.set("strictQuery", true);
 mongoose.connect("mongodb+srv://pavankumarp21:pavan1234@cluster0.k9kh9zv.mongodb.net/INSPIRINGGO?retryWrites=true&w=majority", {
@@ -106,6 +125,6 @@ app.use('/companyLanding/jobseekerEnrolled',CompanyRoutes);
 
 
 
-app.listen(3000, function () {
+app.listen(process.env.PORT || 3000, function () {
   console.log("Server started on port 3000");
 });
